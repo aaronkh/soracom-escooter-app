@@ -1,0 +1,33 @@
+{
+  "name": "escooter",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@react-native-community/async-storage": "^1.6.1",
+    "react": "16.8.6",
+    "react-icons": "^3.7.0",
+    "react-native": "0.60.4",
+    "react-native-permissions": "^1.2.0",
+    "react-navigation": "^3.11.1",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.4",
+    "rn-viewpager": "^1.2.9",
+    "styled-components": "^4.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.0",
+    "@babel/runtime": "^7.5.0",
+    "@react-native-community/eslint-config": "^0.0.3",
+    "babel-jest": "^24.1.0",
+    "jest": "^24.1.0",
+    "metro-react-native-babel-preset": "^0.54.1",
+    "react-test-renderer": "16.8.6"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
