@@ -17,7 +17,7 @@ class Navigator extends Component {
 
   componentDidMount() {
     const finishLoad = (val) => {
-      this.setState({hasChecked: true})
+      this.setState({ hasChecked: true })
       this.props.switchFirstTime(val)
     }
     this.isFirstTime()
@@ -36,8 +36,9 @@ class Navigator extends Component {
   }
 
   render() {
-    if(!this.state.hasChecked) return <View style={{flex: 1, backgroundColor: '#383b44'}}/>
-    return this.props.firstTime ? <Onboarding /> : <Map />
+    // if(!this.state.hasChecked) return <View style={{flex: 1, backgroundColor: '#383b44'}}/>
+    // return this.props.firstTime ? <Onboarding /> : <Map />
+    return <Map />
   }
 }
 

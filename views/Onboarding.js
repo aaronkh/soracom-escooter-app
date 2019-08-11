@@ -25,7 +25,7 @@ class Onboarding extends React.Component {
                 horizontalScroll={false}
                 scrollEnabled={false}
                 style={{ flex: 1 }}
-                initialPage = {1}
+                initialPage = {0}
             >
                 <View>
                     <Welcome next={this.nextPage} />

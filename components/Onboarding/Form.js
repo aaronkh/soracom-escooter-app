@@ -1,11 +1,11 @@
 import React from 'react'
-import { View, TextInput, Text, ActivityIndicator, TouchableWithoutFeedback } from 'react-native'
+import { View, TextInput, Text, ActivityIndicator, TouchableWithoutFeedback, Platform } from 'react-native'
 import TextInputMask from 'react-native-text-input-mask'
+import { CardIOModule, CardIOUtilities } from 'react-native-awesome-card-io'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 import { Title, Subtitle } from '../common/Text'
 import { Shadow } from '../common/Shadow'
-
-import { CardIOModule, CardIOUtilities } from 'react-native-awesome-card-io'
 
 const cleanDigits = (text) => text.replace(/\D/g, '')
 
@@ -21,28 +21,33 @@ class Form extends React.Component {
         }
     }
 
-    componentWillMount(){
-        if(Platform.OS === 'ios'){
+    componentWillMount() {
+        if (Platform.OS === 'ios') {
             CardIOUtilities.preload()
         }
     }
 
-    scanCard(){
+    scanCard = () => {
         CardIOModule
             .scanCard({
-                hideCardIOLogo: true
+                hideCardIOLogo: true,
+                suppressManualEntry: true,
+                suppressConfirmation: true,
+                guideColor: '#34cdd7'
             })
             .then(card => {
-                console.log(card)
-                console.log(card.cardNumber)
-                console.log(card.expiryMonth)
-                console.log(card.expiryYear)
-                console.log(card.cvv)
-                console.log(card.cardholderName)
+                let exp = `${card.expiryMonth}${card.expiryYear}`
+                if (exp === '00') exp = ''
+                this.setState({
+                    name: card.cardholderName,
+                    number: card.cardNumber,
+                    cvc: card.cvv,
+                    expiration: exp
+                })
             }).catch(() => {
-            
+
             })
-    }        
+    }
 
     saveName = name => this.setState({ name })
     saveNumber = (_, number) => this.setState({ number })
@@ -86,8 +91,9 @@ class Form extends React.Component {
                         multiline={false}
                     />
                     <TextInputMask
+                        value={this.state.number}
                         onChangeText={this.saveNumber}
-                        mask={'[00]{/}[00]'}
+                        mask={'[0000] [0000] [0000] [0000]'}
                         placeholder="Card Number"
                         maxLength={19}
                         autoCompleteType="cc-number"
@@ -99,7 +105,7 @@ class Form extends React.Component {
                         multiline={false}
                     />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center' }}>
+                        <View style={{ alignSelf: 'flex-end', justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center' }}>
                             <Text style={{ paddingTop: 12, color: '#FFFFFFDD' }}>Expiry </Text>
                             <TextInputMask
                                 placeholder="  /"
@@ -113,17 +119,29 @@ class Form extends React.Component {
                                 underlineColorAndroid="#34cdd7"
                                 style={{ color: '#FFFFFFDD' }} />
                         </View>
-                        <TextInput
-                            value={this.state.cvc}
-                            onChangeText={this.saveCVC}
-                            autoCompleteType="cc-csc"
-                            placeholder="CVV"
-                            placeholderTextColor="#FFFFFF99"
-                            keyboardType="numeric"
-                            underlineColorAndroid="#34cdd7"
-                            style={{ color: '#FFFFFFDD' }}
-                            multiline={false}
-                            maxLength={4} />
+                        <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
+                            <Icon
+                                onPress={this.scanCard}
+                                name="ios-camera"
+                                style={{
+                                    marginRight: 4,
+                                    marginLeft: 8
+                                }}
+                                color="#ffffffdd"
+                                size={32}
+                            />
+                            <TextInput
+                                value={this.state.cvc}
+                                onChangeText={this.saveCVC}
+                                autoCompleteType="cc-csc"
+                                placeholder="CVV"
+                                placeholderTextColor="#FFFFFF99"
+                                keyboardType="numeric"
+                                underlineColorAndroid="#34cdd7"
+                                style={{ color: '#FFFFFFDD' }}
+                                multiline={false}
+                                maxLength={4} />
+                        </View>
                     </View>
                 </View>
                 <View style={{
@@ -149,21 +167,6 @@ class Form extends React.Component {
                                 </Text>}
                         </View>
                     </TouchableWithoutFeedback>
-                    <TouchableWithoutFeedback
-                        onPress={this.scanCard.bind(this)}>
-                        <View
-                            style={{
-                                backgroundColor: this.state.isSubmitting ? 'grey' : '#006bb7',
-                                borderRadius: 12,
-                                padding: 12,
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                ...(this.state.isSubmitting ? {} : Shadow)
-                            }}>
-                            <Text style={{ color: '#FFFFFFDD' }}>Scan Card</Text>
-                        </View>
-                    </TouchableWithoutFeedback>
-
                 </View>
             </View>
         )
