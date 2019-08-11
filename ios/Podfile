@@ -30,6 +30,8 @@ target 'escooter' do
 
   pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
 
+  pod 'RNAwesomeCardIO', :path => '../node_modules/react-native-awesome-card-io'
+
   target 'escooterTests' do
     inherit! :search_paths
     # Pods for testing

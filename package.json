@@ -10,6 +10,7 @@
     "@react-native-community/async-storage": "^1.6.1",
     "react": "16.8.6",
     "react-native": "0.60.4",
+    "react-native-awesome-card-io": "^0.8.2",
     "react-native-permissions": "^1.2.0",
     "react-native-text-input-mask": "^1.0.6",
     "react-native-vector-icons": "^6.6.0",

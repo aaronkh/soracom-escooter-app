@@ -5,6 +5,8 @@ import TextInputMask from 'react-native-text-input-mask'
 import { Title, Subtitle } from '../common/Text'
 import { Shadow } from '../common/Shadow'
 
+import { CardIOModule, CardIOUtilities } from 'react-native-awesome-card-io'
+
 const cleanDigits = (text) => text.replace(/\D/g, '')
 
 class Form extends React.Component {
@@ -18,6 +20,30 @@ class Form extends React.Component {
             isSubmitting: false
         }
     }
+
+    componentWillMount(){
+        if(Platform.OS === 'ios'){
+            CardIOUtilities.preload()
+        }
+    }
+
+    scanCard(){
+        CardIOModule
+            .scanCard({
+                hideCardIOLogo: true
+            })
+            .then(card => {
+                console.log(card)
+                console.log(card.cardNumber)
+                console.log(card.expiryMonth)
+                console.log(card.expiryYear)
+                console.log(card.cvv)
+                console.log(card.cardholderName)
+            }).catch(() => {
+            
+            })
+    }        
+
     saveName = name => this.setState({ name })
     saveNumber = (_, number) => this.setState({ number })
     saveExpiration = (_, expiration) => this.setState({ expiration })
@@ -120,9 +146,24 @@ class Form extends React.Component {
                             }}>{this.state.isSubmitting ?
                                 <ActivityIndicator size="small" color="#FFFFFFDD" /> : <Text style={{ color: '#FFFFFFDD' }}>
                                     Save
-                     </Text>}
+                                </Text>}
                         </View>
                     </TouchableWithoutFeedback>
+                    <TouchableWithoutFeedback
+                        onPress={this.scanCard.bind(this)}>
+                        <View
+                            style={{
+                                backgroundColor: this.state.isSubmitting ? 'grey' : '#006bb7',
+                                borderRadius: 12,
+                                padding: 12,
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                ...(this.state.isSubmitting ? {} : Shadow)
+                            }}>
+                            <Text style={{ color: '#FFFFFFDD' }}>Scan Card</Text>
+                        </View>
+                    </TouchableWithoutFeedback>
+
                 </View>
             </View>
         )
