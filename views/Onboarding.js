@@ -3,24 +3,38 @@ import React from 'react'
 import { Text, View } from 'react-native'
 import { ViewPager } from 'rn-viewpager'
 
-class Onboarding extends React.Component {
+import Form from '../components/Onboarding/Form'
+import Welcome from '../components/Onboarding/Welcome';
 
+class Onboarding extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            page: 0
+        }
+    }
+    nextPage = () => {
+        let next = this.state.page + 1
+        this.refs["viewpager"].setPage(next)
+        this.setState({ page: next })
+    }
     render() {
         return (
             <ViewPager
-            style={{height:200}}
-            scrollEnabled={false}
-        >
-            <View style={{backgroundColor:'cadetblue'}}>
-                <Text>page one</Text>
-            </View>
-            <View style={{backgroundColor:'cornflowerblue'}}>
-                <Text>page two</Text>
-            </View>
-            <View style={{backgroundColor:'#1AA094'}}>
-                <Text>page three</Text>
-            </View>
-        </ViewPager>)
+                ref="viewpager"
+                horizontalScroll={false}
+                scrollEnabled={false}
+                style={{ flex: 1 }}
+                initialPage = {1}
+            >
+                <View>
+                    <Welcome next={this.nextPage} />
+                </View>
+                <View>
+                    <Form/>
+                </View>
+            </ViewPager>
+        )
     }
 }
 
