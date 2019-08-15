@@ -7,10 +7,15 @@ buildscript {
         compileSdkVersion = 28
         targetSdkVersion = 28
         supportLibVersion = "28.0.0"
+        androidMapsUtilsVersion = "0.5+"
     }
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://maven.google.com'
+            name 'Google'
+        }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.4.1")
@@ -31,7 +36,11 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-
+        maven {
+            url 'https://maven.google.com'
+            name 'Google'
+        }
+        maven { url "https://jitpack.io" }
         google()
         jcenter()
     }

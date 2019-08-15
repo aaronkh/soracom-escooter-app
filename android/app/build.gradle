@@ -129,6 +129,7 @@ android {
 
     defaultConfig {
         applicationId "com.escooter"
+        missingDimensionStrategy 'react-native-camera', 'general'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -153,6 +154,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            resValue 'string', "GMAPS_SDK_KEY", GMAPS_SDK_KEY
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -160,6 +162,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            resValue 'string', "GMAPS_SDK_KEY", GMAPS_SDK_KEY
         }
     }
     // applicationVariants are e.g. debug, release
@@ -189,6 +192,7 @@ android {
 
 dependencies {
     implementation project(':react-native-awesome-card-io')
+    implementation project(':react-native-camera')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
