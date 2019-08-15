@@ -1,7 +1,7 @@
 # soracom-escooter-app
 This app accompanies the server tutorial for building an escooter app using SORACOM services (Link coming soon). Test it out by using one of the prebuilt apks from the releases tab above. Built with React native.
 
-# Building and Running    
+## Building and Running    
 This app has **not** been tested or built for iOS. Follow these instructions to build for Android only.    
 
 1. Add a Google Maps SDK Key
@@ -19,7 +19,7 @@ This app has **not** been tested or built for iOS. Follow these instructions to 
   
 **Congratulations!** Your escooter app is ready.
 
-# Contributing    
-This app is missing a lot of features, most notably animations and proper permission handling. iOS support is also missing. Feel free to fork and leave a pull request!
+## Contributing    
+This app is missing a lot of features, most notably animations and proper navigation. iOS support is also missing. Feel free to fork and leave a pull request!
 
   
