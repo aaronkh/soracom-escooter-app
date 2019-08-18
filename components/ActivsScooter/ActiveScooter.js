@@ -1,15 +1,15 @@
 import React from 'react'
 import { View, Dimensions, ActivityIndicator, TouchableWithoutFeedback } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import Shadow from '../common/Shadow'
 import Colors from '../common/Colors'
 import { Title, Text as DefaultText, Subtitle } from '../common/Text'
-import {msToMinutes, minutesToHourString} from '../../util/TimeCalculator'
-import {switchCCToken} from '../../redux/actions/actions'
+import { msToMinutes, minutesToHourString } from '../../util/TimeCalculator'
+import { switchCCToken } from '../../redux/actions/actions'
 
-const Text = (props) => <DefaultText {...props} style={{...props.style, color: Colors.textColor}}> {props.children} </DefaultText>
+const Text = (props) => <DefaultText {...props} style={{ ...props.style, color: Colors.textColor }}> {props.children} </DefaultText>
 const Row = (props) => <View style={{ ...props.style, marginBottom: 8, flexDirection: 'row', alignItems: 'flex-end' }} {...props}>{props.children}</View>
 const LeftText = (props) => <Subtitle {...props} style={{ ...props.style, flex: 1, fontSize: 18, color: Colors.textColor }}> {props.children} </Subtitle>
 
@@ -21,27 +21,33 @@ class ActiveScooter extends React.Component {
             width: width,
             height: height,
             initalTime: '',
-            time: '',
+            time: (new Date).getTime(),
             timer: '',
             isSubmitting: false,
             name: '',
-            price: ''
+            price: '',
         }
     }
 
     submit = () => {
-        console.log('submit', parseFloat(msToMinutes(this.state.time - this.state.initalTime) * this.state.price).toFixed(2))
+        this.setState({isSubmitting: true})
+        // console.log('submit', parseFloat(msToMinutes(this.state.time - this.state.initalTime) * this.state.price).toFixed(2))
         AsyncStorage.multiRemove([
-            ['@start_time', '@cc_token', '@scooter_name', '@scooter_price']
-        ]).then(setTimeout(this.props.switchCCToken(''), 3333))
+            '@start_time', '@cc_token', '@scooter_name', '@scooter_price'
+        ]).then(setTimeout(() => this.props.switchCCToken(''), 3333))
     }
 
     updateTime = () => {
-        this.setState({ time: (new Date).getTime() })
+        try{
+            this.setState({ time: (new Date).getTime() })
+        } catch(err) {
+            console.log(err)
+        }
     }
 
     getTime = async () => {
         const initalTime = await AsyncStorage.getItem('@start_time')
+        if (this.state.timer) return
         this.setState({
             initalTime: initalTime,
             timer: setInterval(this.updateTime, 5000)
@@ -51,7 +57,7 @@ class ActiveScooter extends React.Component {
     getProps = async () => {
         let name = await AsyncStorage.getItem('@scooter_name')
         let price = await AsyncStorage.getItem('@scooter_price')
-        this.setState({ name: name, price: price/100 })
+        this.setState({ name: name, price: price / 100 })
     }
 
     componentWillUnmount() {
@@ -75,7 +81,7 @@ class ActiveScooter extends React.Component {
                 elevation: 999,
                 padding: 30
             }}>
-                <Title style={{color: Colors.accentColorBright}}>{this.state.name}</Title>
+                <Title style={{ color: Colors.accentColorBright, textAlign: 'center', marginBottom: 20 }}>{this.state.name}</Title>
                 <Row>
                     <LeftText>Price</LeftText>
                     <Text>${this.state.price}/min</Text>
@@ -120,7 +126,7 @@ class ActiveScooter extends React.Component {
 }
 
 function mapDispatchToProps(dispatch) {
-    return {switchCCToken: val => dispatch(switchCCToken(val))}
+    return { switchCCToken: val => dispatch(switchCCToken(val)) }
 }
 
 export default connect(null, mapDispatchToProps)(ActiveScooter)

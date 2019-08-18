@@ -50,17 +50,19 @@ class CreditCard extends React.Component {
     saveNumber = (_, number) => this.setState({ number })
     saveExpiration = (_, expiration) => this.setState({ expiration })
     saveCVC = cvc => this.setState({ cvc: cleanDigits(cvc) })
+    onSubmit = () => {this.props.switchCCToken('hello'); this.props.submitSuccess()}
 
     submit = () => {
         // put cc token in
         this.setState({ isSubmitting: true })
-        this.props.switchCCToken('hello')
         AsyncStorage.multiSet(
-           [ ['@start_time', (new Date).getTime()], 
+           [ 
+            ['@start_time', '' + (new Date()).getTime()], 
             ['@cc_token', 'hello'], 
             ['@scooter_name', this.props.scooterName],
-            ['@scooter_price', cleanDigits(this.props.scooterPrice)]], 
-            ()=>setTimeout(this.props.submitSuccess, 3333))
+            ['@scooter_price', cleanDigits(this.props.scooterPrice)]
+        ], 
+            () => setTimeout(this.onSubmit, 3333))
     }
 
     render() {
