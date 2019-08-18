@@ -1,13 +1,13 @@
 import React from 'react'
-import {Provider } from 'react-redux'
-import {createStore} from 'redux'
-import {View} from 'react-native'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 
-import {reducer} from './redux/reducers/reducers'
+import Colors from './components/common/Colors'
+import { reducer } from './redux/reducers/reducers'
 import Navigator from './Navigator'
 
 const store = createStore(reducer)
 
-const App = () => <Provider store={store}><Navigator /></Provider>
+const App = () => <Provider store={store}><Navigator style={{ backgroundColor: Colors.backgroundColor }} /></Provider>
 
 export default App
