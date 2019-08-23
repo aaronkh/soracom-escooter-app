@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
-import { View, PermissionsAndroid, Text } from 'react-native'
+import { View, PermissionsAndroid, ToastAndroid } from 'react-native'
 import Geolocation from 'react-native-geolocation-service'
-import MapView, { Marker, Callout } from 'react-native-maps'
+import MapView, { Marker } from 'react-native-maps'
 import { connect } from 'react-redux'
 import AsyncStorage from '@react-native-community/async-storage'
 
@@ -16,15 +16,10 @@ import QRCodeScanner from '../components/QRCodeScanner/QRCodeScanner'
 import ActiveScooter from '../components/ActivsScooter/ActiveScooter'
 import { switchCCToken } from '../redux/actions/actions'
 
+import API from '../API'
 import { distanceBetween } from '../util/DistanceCalculator'
 
 const MAP_ANIMATION_DURATION = 888
-const FAKE_SCOOTER_LOCATIONS = [
-    { _id: 0, longitude: -122.5022639462199, latitude: 37.76872868979763 },
-    { _id: 1, longitude: -122.4929547979371, latitude: 37.78290650705166 },
-    { _id: 2, longitude: -122.501239215147, latitude: 37.77325481238279 },
-    { _id: 3, longitude: -122.48919211437241, latitude: 37.781040306887824 },
-    { _id: 4, longitude: -122.50502787240144, latitude: 37.77288140696781 }]
 
 class Map extends React.Component {
     constructor(props) {
@@ -32,6 +27,7 @@ class Map extends React.Component {
         this.state = {
             lat: 37.8,
             lng: -122.4,
+            scooters: [],
             permissionGPS: true,
             gpsActive: false,
             activeScooter: false,
@@ -111,9 +107,11 @@ class Map extends React.Component {
     findScooter = async (location) => {
         let lat = location.nativeEvent.coordinate.latitude
         let lng = location.nativeEvent.coordinate.longitude
-        await FAKE_SCOOTER_LOCATIONS.map(i => {
-            if (i.longitude == lng && i.latitude == lat) {
-                this.setState({ activeScooter: i })
+        await this.state.scooters.map((i, ind) => {
+            if (i.coords.lng == lng && i.coords.lat == lat) {
+                let a = i
+                i.id = ind
+                this.setState({ activeScooter: a })
             }
         })
     }
@@ -123,9 +121,26 @@ class Map extends React.Component {
         this.props.switchCCToken(ccToken)
     }
 
+    loadScooters = async () => {
+        try {
+            let res = await API.getScooters()
+            for(let scooter of res) {
+                scooter.mapCoords = {
+                    latitude: scooter.coords.lat,
+                    longitude: scooter.coords.lng
+                }
+            }
+            this.setState({scooters: res})
+        } catch(err) {
+            //TODO:
+            console.log(err)
+        }
+    }
+
     componentDidMount() {
         this.askPermissions()
         this.checkActive()
+        this.loadScooters()
     }
 
     componentWillUnmount() {
@@ -151,8 +166,8 @@ class Map extends React.Component {
                         <UserLocation />
                     </Marker>
                     {
-                        FAKE_SCOOTER_LOCATIONS.map(i =>
-                            <Marker onPress={this.findScooter} key={i._id} coordinate={i} title={`Scooter #` + i._id} pinColor={'teal'} />)
+                        this.state.scooters.map((i, ind) =>
+                            <Marker onPress={this.findScooter} key={ind} coordinate={i.mapCoords} title={`Scooter #` + ind} pinColor={'teal'} />)
                     }
                 </MapView>
 
@@ -163,10 +178,10 @@ class Map extends React.Component {
                 </View>
                 {this.state.activeScooter &&
                     <ScooterPreview
-                        name={'Scooter #' + (this.state.activeScooter._id + 1)}
-                        distance={distanceBetween(this.state.lat, this.state.lng, this.state.activeScooter.latitude, this.state.activeScooter.longitude)}
-                        price="0.21"
-                        battery="50"
+                        name={'Scooter #' + (this.state.activeScooter.id)}
+                        distance={distanceBetween(this.state.lat, this.state.lng, this.state.activeScooter.coords.lat, this.state.activeScooter.coords.lng)}
+                        price={this.state.activeScooter.price/100}
+                        battery={this.state.activeScooter.battery}
                     />}
                 {this.state.QRScannerOpen &&
                     <QRCodeScanner

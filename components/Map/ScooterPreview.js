@@ -17,7 +17,7 @@ class ScooterPreview extends React.Component {
         if(props.distance < 0.01) {
             distanceText = Math.round(props.distance * 5280) + ' feet away'
         } else {
-            distanceText = parseFloat(props.distance).toFixed(2) + ' feet away'
+            distanceText = parseFloat(props.distance).toFixed(2) + ' miles away'
         }
         this.state = {
             width: width > height ? height - 20 : width - 20,

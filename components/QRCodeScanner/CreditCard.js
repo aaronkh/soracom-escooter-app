@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, TextInput, Text, ActivityIndicator, TouchableWithoutFeedback } from 'react-native'
+import { View, TextInput, Text, ActivityIndicator, TouchableWithoutFeedback, Alert } from 'react-native'
 import TextInputMask from 'react-native-text-input-mask'
 import { CardIOModule } from 'react-native-awesome-card-io'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import {switchCCToken} from '../../redux/actions/actions'
 import { Title, Subtitle, Text as SmallText } from '../common/Text'
 import { Shadow } from '../common/Shadow'
+import API from '../../API';
 
 const cleanDigits = (text) => text.replace(/\D/g, '')
 
@@ -50,19 +51,41 @@ class CreditCard extends React.Component {
     saveNumber = (_, number) => this.setState({ number })
     saveExpiration = (_, expiration) => this.setState({ expiration })
     saveCVC = cvc => this.setState({ cvc: cleanDigits(cvc) })
-    onSubmit = () => {this.props.switchCCToken('hello'); this.props.submitSuccess()}
+    onSubmit = () => {this.props.switchCCToken(this.state.ccToken); this.props.submitSuccess()}
 
-    submit = () => {
+    submit = async () => {
         // put cc token in
         this.setState({ isSubmitting: true })
-        AsyncStorage.multiSet(
-           [ 
-            ['@start_time', '' + (new Date()).getTime()], 
-            ['@cc_token', 'hello'], 
-            ['@scooter_name', this.props.scooterName],
-            ['@scooter_price', cleanDigits(this.props.scooterPrice)]
-        ], 
-            () => setTimeout(this.onSubmit, 3333))
+        console.log(this.state.number, this.state.expiration, this.state.cvc)
+        try{
+            let res = await API.createStripeToken({
+                number: this.state.number,
+                month: this.state.expiration.substr(0, 2),
+                year: '20' + this.state.expiration.substr(-2),
+                cvc: this.state.cvc
+            })
+            
+            let json = await res.json()
+            console.log('json', json)
+            let ccToken = await API.getStripeToken(json['id'])
+            console.log('cctok', ccToken)
+            AsyncStorage.multiSet(
+                [ 
+                 ['@cc_token', ccToken], 
+                 ['@scooter_name', this.props.scooterName],
+                 ['@scooter_price', cleanDigits(this.props.scooterPrice)]
+             ], this.onSubmit
+             )
+        } catch(err) {
+            this.setState({ isSubmitting: false })
+            console.log(err.sourceURL, ':', err.line)
+            Alert.alert(
+                'Error submitting credit card information','',
+                [
+                    {text: 'OK', onPress: () => console.log('OK Pressed')},
+                ]
+            )
+        }
     }
 
     render() {
@@ -79,7 +102,7 @@ class CreditCard extends React.Component {
                     {this.props.scooterName}
                 </Title>
                 <Subtitle style={{ color: '#34cdd7', textAlign: 'center' }}>
-                    {this.props.scooterPrice}
+                    {/* {this.props.scooterPrice} */}
                 </Subtitle>
                 <View
                     style={{
@@ -172,7 +195,7 @@ class CreditCard extends React.Component {
                                 backgroundColor: this.state.isSubmitting ? 'grey' : '#006bb7',
                                 borderRadius: 12,
                                 padding: 12,
-                                marginBottom: 12,
+                                marginBottom: 35,
                                 flexDirection: 'row',
                                 justifyContent: 'center',
                                 ...(this.state.isSubmitting ? {} : Shadow)

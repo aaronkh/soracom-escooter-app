@@ -8,6 +8,7 @@ import Colors from '../common/Colors'
 import { Title, Text as DefaultText, Subtitle } from '../common/Text'
 import { msToMinutes, minutesToHourString } from '../../util/TimeCalculator'
 import { switchCCToken } from '../../redux/actions/actions'
+import API from '../../API';
 
 const Text = (props) => <DefaultText {...props} style={{ ...props.style, color: Colors.textColor }}> {props.children} </DefaultText>
 const Row = (props) => <View style={{ ...props.style, marginBottom: 8, flexDirection: 'row', alignItems: 'flex-end' }} {...props}>{props.children}</View>
@@ -33,8 +34,13 @@ class ActiveScooter extends React.Component {
         this.setState({isSubmitting: true})
         // console.log('submit', parseFloat(msToMinutes(this.state.time - this.state.initalTime) * this.state.price).toFixed(2))
         AsyncStorage.multiRemove([
-            '@start_time', '@cc_token', '@scooter_name', '@scooter_price'
-        ]).then(setTimeout(() => this.props.switchCCToken(''), 3333))
+            '@cc_token', '@scooter_name', '@scooter_price'
+        ]).then(
+            () => {
+                API.stopRide(this.state.ccToken)
+                this.props.switchCCToken('')
+            }
+        )
     }
 
     updateTime = () => {
@@ -47,8 +53,10 @@ class ActiveScooter extends React.Component {
 
     getTime = async () => {
         const initalTime = await AsyncStorage.getItem('@start_time')
+        const ccToken = await AsyncStorage.getItem('@cc_token')
         if (this.state.timer) return
         this.setState({
+            ccToken: ccToken,
             initalTime: initalTime,
             timer: setInterval(this.updateTime, 5000)
         })
