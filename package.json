@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.1",
+    "Base64": "^1.0.2",
     "node-fetch": "^2.6.0",
     "react": "16.8.6",
     "react-native": "0.60.4",
@@ -23,8 +24,7 @@
     "react-navigation": "^3.11.1",
     "react-redux": "^7.1.0",
     "redux": "^4.0.4",
-    "rn-viewpager": "^1.2.9",
-    "tipsi-stripe": "^7.5.1"
+    "rn-viewpager": "^1.2.9"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",

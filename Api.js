@@ -1,5 +1,10 @@
-import base64 from 'react-native-base64'
-import stripe from 'tipsi-stripe'
+import Base64 from 'Base64'
+// const fetch = require('node-fetch')
+
+const btoa = (s) => {
+    return Base64.btoa(s)
+    // return Buffer.from(s).toString('base64')
+}
 
 class API {
 
@@ -8,7 +13,7 @@ class API {
 
     static async findById(id) {
         const response = await fetch(`${this.url}/scooters/${id}`)
-        if (response.ok) return response
+        if (response.ok) return response.json()
         throw new Error(response)
     }
 
@@ -47,19 +52,46 @@ class API {
     }
 
     static async createStripeToken(req) {
-        stripe.setOptions({
-            publishableKey: this.stripeKey,
-        })
-        try {
-            return await stripe.createTokenWithCard({
-                number: req.number,
-                expMonth: req.month,
-                expYear: req.year,
-                cvc: req.cvc
-            })
-        } catch (err) {
-            throw new Error(err)
+        let encodedKey = btoa(this.stripeKey)
+        let body = []
+
+        let details = req
+
+        for (var property in details) {
+            var ek = encodeURIComponent(property);
+            var ev = encodeURIComponent(details[property]);
+            body.push(ek + "=" + ev);
         }
+        body = body.join("&")
+        console.log(body)
+        let res = await fetch('https://api.stripe.com/v1/tokens',
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json', 
+                    'Authorization': `Basic ${encodedKey}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: body
+            }
+        )
+        console.log(res)
+        if(res.ok) return res
+        throw new Error(res)
+    }
+
+    static async getStripeToken(token_id) {
+        let encodedKey = btoa(this.stripeKey)
+
+        let res = await fetch(`https://api.stripe.com/v1/tokens/${token_id}`,
+            {
+                headers: {
+                    'Authorization': `Basic ${encodedKey}`,
+                }
+            }
+        )
+        if(res.ok) return res
+        throw new Error(res)
     }
 
     static async startRide(req) {
@@ -77,10 +109,10 @@ class API {
         throw new Error(res)
     }
 
-    static async stopRide(req) {
-        if (!req.transactionId) throw new Error('`transactionId` is required to stop a ride')
+    static async stopRide(transactionId) {
+        if (!transactionId) throw new Error('`transactionId` is required to stop a ride')
 
-        let res = await fetch(`${this.url}/transactions/${req.transactionId}`, {
+        let res = await fetch(`${this.url}/transactions/${transactionId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'

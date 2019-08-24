@@ -18,8 +18,15 @@ import { switchCCToken } from '../redux/actions/actions'
 
 import API from '../API'
 import { distanceBetween } from '../util/DistanceCalculator'
+import ScooterMarker from '../components/Map/ScooterMarker';
 
 const MAP_ANIMATION_DURATION = 888
+const PLACEHOLDER_SCOOTER = {
+    name: 'Loading scooter data...',
+    distance: 999,
+    price: 999,
+    battery: 100
+}
 
 class Map extends React.Component {
     constructor(props) {
@@ -82,6 +89,11 @@ class Map extends React.Component {
         this.recenterMap()
     }
 
+    onCalloutPress = () => {
+        // set state 
+        this.openQRScanner()
+    }
+
     askPermissions = () => {
         PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
             .then(result => {
@@ -105,6 +117,8 @@ class Map extends React.Component {
     }
 
     findScooter = async (location) => {
+        this.setState({activeScooter: PLACEHOLDER_SCOOTER})
+        // TODO: make API request to get scooter by location
         let lat = location.nativeEvent.coordinate.latitude
         let lng = location.nativeEvent.coordinate.longitude
         await this.state.scooters.map((i, ind) => {
@@ -118,6 +132,7 @@ class Map extends React.Component {
 
     checkActive = async () => {
         const ccToken = await AsyncStorage.getItem('@cc_token')
+        console.log('token in map', ccToken)
         this.props.switchCCToken(ccToken)
     }
 
@@ -132,7 +147,7 @@ class Map extends React.Component {
             }
             this.setState({scooters: res})
         } catch(err) {
-            //TODO:
+            //TODO: display error message
             console.log(err)
         }
     }
@@ -167,24 +182,32 @@ class Map extends React.Component {
                     </Marker>
                     {
                         this.state.scooters.map((i, ind) =>
-                            <Marker onPress={this.findScooter} key={ind} coordinate={i.mapCoords} title={`Scooter #` + ind} pinColor={'teal'} />)
+                            <ScooterMarker
+                                id={i._id}
+                                mac={i.mac} 
+                                onCalloutPress={this.onCalloutPress}
+                                onPress={this.findScooter} 
+                                key={ind} 
+                                coordinate={i.mapCoords} 
+                                title="Unlock" 
+                                pinColor={'teal'} />)
                     }
                 </MapView>
 
                 <View style={{ position: 'absolute', alignItems: 'flex-end', bottom: 18, right: 12 }}>
                     <CenterButton onPress={this.recenterMap} />
-                    <Spacer height={8} />
-                    <QRScanButton onPress={this.openQRScanner} />
                 </View>
                 {this.state.activeScooter &&
                     <ScooterPreview
-                        name={'Scooter #' + (this.state.activeScooter.id)}
+                        name={'Scooter #' + (this.state.activeScooter.mac)}
                         distance={distanceBetween(this.state.lat, this.state.lng, this.state.activeScooter.coords.lat, this.state.activeScooter.coords.lng)}
-                        price={this.state.activeScooter.price/100}
+                        price={this.state.activeScooter.price}
                         battery={this.state.activeScooter.battery}
                     />}
                 {this.state.QRScannerOpen &&
                     <QRCodeScanner
+                        mac={this.state.activeScooter.mac}
+                        price={this.state.activeScooter.price}
                         close={this.closeQRScanner}
                     />}
                 {this.props.ccToken ? <ActiveScooter /> :

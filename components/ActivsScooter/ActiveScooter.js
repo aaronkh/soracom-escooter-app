@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Dimensions, ActivityIndicator, TouchableWithoutFeedback } from 'react-native'
+import { View, Dimensions, Animated, ActivityIndicator, TouchableWithoutFeedback, Alert } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux'
 
@@ -19,53 +19,73 @@ class ActiveScooter extends React.Component {
         super(props)
         let { width, height } = Dimensions.get('window')
         this.state = {
+            position: new Animated.Value(0),
             width: width,
             height: height,
-            initalTime: '',
+            initalTime: (new Date).getTime(),
             time: (new Date).getTime(),
             timer: '',
-            isSubmitting: false,
-            name: '',
-            price: '',
+            isSubmitting: true,
+            name: 'Loading...',
+            price: '999',
         }
     }
 
-    submit = () => {
-        this.setState({isSubmitting: true})
-        // console.log('submit', parseFloat(msToMinutes(this.state.time - this.state.initalTime) * this.state.price).toFixed(2))
-        AsyncStorage.multiRemove([
-            '@cc_token', '@scooter_name', '@scooter_price'
-        ]).then(
-            () => {
-                API.stopRide(this.state.ccToken)
-                this.props.switchCCToken('')
-            }
-        )
+    transition = () => this.props.switchCCToken('')
+
+    submit = async () => {
+        this.setState({ isSubmitting: true })
+        try {
+            await API.stopRide(this.state.ccToken)
+            await AsyncStorage.multiRemove([
+                '@cc_token', '@scooter_id', '@start_time'
+            ])
+            Animated.timing(
+                this.state.position,
+                {
+                    toValue: this.state.height,
+                    velocity: 333,
+                }
+            ).start(() => this.transition)
+        } catch (err) {
+            Alert.alert(
+                'Error ending ride', '',
+                [
+                    { text: 'OK', onPress: () => console.log('OK Pressed') },
+                ]
+            )
+            this.setState({ isSubmitting: false })
+        }
     }
 
     updateTime = () => {
-        try{
+        try {
             this.setState({ time: (new Date).getTime() })
-        } catch(err) {
+        } catch (err) {
             console.log(err)
         }
     }
 
     getTime = async () => {
         const initalTime = await AsyncStorage.getItem('@start_time')
-        const ccToken = await AsyncStorage.getItem('@cc_token')
         if (this.state.timer) return
         this.setState({
-            ccToken: ccToken,
             initalTime: initalTime,
             timer: setInterval(this.updateTime, 5000)
         })
     }
 
     getProps = async () => {
-        let name = await AsyncStorage.getItem('@scooter_name')
-        let price = await AsyncStorage.getItem('@scooter_price')
-        this.setState({ name: name, price: price / 100 })
+        let id = await AsyncStorage.getItem('@scooter_id')
+        let token = await AsyncStorage.getItem('@cc_token')
+        console.log('id', id)
+        console.log('token', token)
+        // ask server for this...
+        let scooter = await API.findById(id)
+        console.log(scooter)
+        let name = "Scooter #" + scooter.mac
+        let price = scooter.price
+        this.setState({ isSubmitting: false, name: name, price: price / 100, ccToken: token })
     }
 
     componentWillUnmount() {
@@ -79,9 +99,9 @@ class ActiveScooter extends React.Component {
 
     render() {
         return (
-            <View style={{
+            <Animated.View style={{
                 position: 'absolute',
-                top: 0,
+                top: this.state.position,
                 left: 0,
                 width: this.state.width,
                 height: this.state.height,
@@ -89,7 +109,9 @@ class ActiveScooter extends React.Component {
                 elevation: 999,
                 padding: 30
             }}>
-                <Title style={{ color: Colors.accentColorBright, textAlign: 'center', marginBottom: 20 }}>{this.state.name}</Title>
+                <Title style={{ color: Colors.accentColorBright, textAlign: 'center', marginBottom: 20 }}>
+                    {this.state.name}
+                </Title>
                 <Row>
                     <LeftText>Price</LeftText>
                     <Text>${this.state.price}/min</Text>
@@ -128,7 +150,7 @@ class ActiveScooter extends React.Component {
                         </View>
                     </TouchableWithoutFeedback>
                 </View>
-            </View>
+            </Animated.View>
         )
     }
 }

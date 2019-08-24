@@ -46,7 +46,7 @@ class ScooterPreview extends React.Component {
                 <Row>
                     <LeftText>Price</LeftText>
                     <Text>
-                        {this.props.price}/min
+                        ${(this.props.price/100).toLocaleString("en-US", {style:"currency", currency:"USD"})}/min
                     </Text>
                 </Row>
                 <Row>

@@ -56,31 +56,39 @@ class CreditCard extends React.Component {
     submit = async () => {
         // put cc token in
         this.setState({ isSubmitting: true })
-        console.log(this.state.number, this.state.expiration, this.state.cvc)
         try{
             let res = await API.createStripeToken({
-                number: this.state.number,
-                month: this.state.expiration.substr(0, 2),
-                year: '20' + this.state.expiration.substr(-2),
-                cvc: this.state.cvc
+                'card[name]': this.state.name,
+                'card[number]': this.state.number,
+                'card[exp_month]': this.state.expiration.substr(0, 2),
+                'card[exp_year]': '20' + this.state.expiration.substr(-2),
+                'card[cvc]': this.state.cvc
             })
             
             let json = await res.json()
-            console.log('json', json)
-            let ccToken = await API.getStripeToken(json['id'])
-            console.log('cctok', ccToken)
-            AsyncStorage.multiSet(
-                [ 
-                 ['@cc_token', ccToken], 
-                 ['@scooter_name', this.props.scooterName],
-                 ['@scooter_price', cleanDigits(this.props.scooterPrice)]
-             ], this.onSubmit
-             )
+            let id = json['id']
+            let ccToken = await API.startRide({
+                'token': id,
+                'mac': this.props.mac
+            })
+            let transactionId = ccToken._id
+            console.log('transaction id', transactionId)
+            console.log(JSON.stringify(ccToken))
+            let scooterId = ccToken.scooterId
+            console.log('scooter id', scooterId)
+            this.setState({ccToken: transactionId})
+            
+            let dateArray = ['@start_time', (new Date).getTime().toString()]
+            let tokArray = ['@cc_token', transactionId]
+            let scooterArray = ['@scooter_id', scooterId]
+            await AsyncStorage.multiSet(
+                [ dateArray, tokArray, scooterArray ])
+             this.onSubmit()
         } catch(err) {
             this.setState({ isSubmitting: false })
-            console.log(err.sourceURL, ':', err.line)
+            console.log(err)
             Alert.alert(
-                'Error submitting credit card information','',
+                'Error starting scooter','',
                 [
                     {text: 'OK', onPress: () => console.log('OK Pressed')},
                 ]
@@ -102,7 +110,7 @@ class CreditCard extends React.Component {
                     {this.props.scooterName}
                 </Title>
                 <Subtitle style={{ color: '#34cdd7', textAlign: 'center' }}>
-                    {/* {this.props.scooterPrice} */}
+                    {this.props.scooterPrice}
                 </Subtitle>
                 <View
                     style={{
