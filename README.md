@@ -25,6 +25,6 @@ This app has **not** been tested or built for iOS. Follow these instructions to 
 **Congratulations!** Your escooter app is ready.
 
 ## Contributing    
-This app is missing a lot of features, most notably animations and proper navigation. iOS support is also missing. Feel free to fork and leave a pull request!
+This app is missing a lot of features, most notably proper error handling and navigation. iOS support is also missing. Feel free to fork and leave a pull request!
 
   

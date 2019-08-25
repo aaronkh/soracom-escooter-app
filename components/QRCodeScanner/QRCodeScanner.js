@@ -24,21 +24,15 @@ class QRCodeScanner extends React.Component {
         Animated.timing(
             this.state.position,
             {
-              toValue: 0,  
-              velocity: 333, 
+                toValue: 0,
+                velocity: 333,
             }
-          ).start()     
+        ).start()
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if(this.state.text.length > 0) {
+            if (this.state.text.length > 0) {
                 this.setState({ text: '' })
             } else {
-                Animated.timing(
-                    this.state.position,
-                    {
-                        toValue: this.state.height,  
-                        velocity: 333, 
-                    }
-                    ).start(this.props.close)
+                this.close()
             }
             return true;
         });
@@ -54,6 +48,16 @@ class QRCodeScanner extends React.Component {
             this.setState({ text: text.data })
     }
 
+    close = () => {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: this.state.height,
+                velocity: 333,
+            }
+        ).start(this.props.close)
+    }
+
     render() {
         return (
             <Animated.View style={{
@@ -66,11 +70,11 @@ class QRCodeScanner extends React.Component {
                 elevation: 99
             }}>
                 {this.state.text.length > 0 ?
-                    <CreditCard 
+                    <CreditCard
                         mac={this.props.mac}
-                        scooterName={'Scooter #'+this.props.mac} 
-                        scooterPrice={`$${(this.props.price/100).toLocaleString("en-US", {style:"currency", currency:"USD"})}/min`} 
-                        submitSuccess={this.props.close}/> :
+                        scooterName={'Scooter #' + this.props.mac}
+                        scooterPrice={`$${(this.props.price / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })}/min`}
+                        submitSuccess={this.props.close} /> :
                     <Fragment>
                         <Title style={{ margin: 20, textAlign: 'center', color: Colors.accentColorBright }}>Scan to Unlock</Title>
                         <Scanner
@@ -85,7 +89,7 @@ class QRCodeScanner extends React.Component {
                                 name={'md-arrow-down'}
                                 size={48}
                                 color={Colors.textColor}
-                                onPress={this.props.close}
+                                onPress={this.close}
                             />
                         </View>
                     </Fragment>}
