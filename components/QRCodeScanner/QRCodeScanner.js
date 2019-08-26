@@ -1,10 +1,9 @@
-import React, { Fragment } from 'react'
-import Scanner from 'react-native-qrcode-scanner'
-import { View, Dimensions, BackHandler, Animated } from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons'
-
-import Colors from '../common/Colors'
-import { Title } from '../common/Text'
+import React, { Fragment } from 'react';
+import { Animated, BackHandler, Dimensions, View } from 'react-native';
+import Scanner from 'react-native-qrcode-scanner';
+import Icon from 'react-native-vector-icons/Ionicons';
+import Colors from '../common/Colors';
+import { Title } from '../common/Text';
 import CreditCard from './CreditCard';
 
 class QRCodeScanner extends React.Component {

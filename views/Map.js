@@ -1,24 +1,19 @@
-import React, { Fragment } from 'react'
-import { View, PermissionsAndroid, ToastAndroid } from 'react-native'
-import Geolocation from 'react-native-geolocation-service'
-import MapView, { Marker } from 'react-native-maps'
-import { connect } from 'react-redux'
-import AsyncStorage from '@react-native-community/async-storage'
-
-import Colors from '../components/common/Colors'
-import MapStyle from '../components/Map/MapStyle'
-import QRScanButton from '../components/Map/QRScanButton'
-import CenterButton from '../components/Map/CenterButton'
-import Spacer from '../components/common/Spacer'
-import UserLocation from '../components/Map/UserLocation'
-import ScooterPreview from '../components/Map/ScooterPreview'
-import QRCodeScanner from '../components/QRCodeScanner/QRCodeScanner'
-import ActiveScooter from '../components/ActivsScooter/ActiveScooter'
-import { switchCCToken } from '../redux/actions/actions'
-
-import API from '../API'
-import { distanceBetween } from '../util/DistanceCalculator'
+import AsyncStorage from '@react-native-community/async-storage';
+import React, { Fragment } from 'react';
+import { PermissionsAndroid, View } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
+import MapView, { Marker } from 'react-native-maps';
+import { connect } from 'react-redux';
+import API from '../API';
+import ActiveScooter from '../components/ActivsScooter/ActiveScooter';
+import CenterButton from '../components/Map/CenterButton';
+import MapStyle from '../components/Map/MapStyle';
 import ScooterMarker from '../components/Map/ScooterMarker';
+import ScooterPreview from '../components/Map/ScooterPreview';
+import UserLocation from '../components/Map/UserLocation';
+import QRCodeScanner from '../components/QRCodeScanner/QRCodeScanner';
+import { switchCCToken } from '../redux/actions/actions';
+import { distanceBetween } from '../util/DistanceCalculator';
 
 const MAP_ANIMATION_DURATION = 888
 const PLACEHOLDER_SCOOTER = {

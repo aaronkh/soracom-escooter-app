@@ -1,14 +1,14 @@
-import React from 'react'
-import { View, Dimensions, Animated, ActivityIndicator, TouchableWithoutFeedback, Alert } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
-import { connect } from 'react-redux'
-
-import Shadow from '../common/Shadow'
-import Colors from '../common/Colors'
-import { Title, Text as DefaultText, Subtitle } from '../common/Text'
-import { msToMinutes, minutesToHourString } from '../../util/TimeCalculator'
-import { switchCCToken } from '../../redux/actions/actions'
+import React from 'react';
+import { ActivityIndicator, Alert, Animated, Dimensions, TouchableWithoutFeedback, View } from 'react-native';
+import { connect } from 'react-redux';
 import API from '../../API';
+import { switchCCToken } from '../../redux/actions/actions';
+import { minutesToHourString, msToMinutes } from '../../util/TimeCalculator';
+import Colors from '../common/Colors';
+import Shadow from '../common/Shadow';
+import { Subtitle, Text as DefaultText, Title } from '../common/Text';
+
 
 const Text = (props) => <DefaultText {...props} style={{ ...props.style, color: Colors.textColor }}> {props.children} </DefaultText>
 const Row = (props) => <View style={{ ...props.style, marginBottom: 8, flexDirection: 'row', alignItems: 'flex-end' }} {...props}>{props.children}</View>

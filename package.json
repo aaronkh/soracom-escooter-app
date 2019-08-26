@@ -9,11 +9,9 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.1",
     "Base64": "^1.0.2",
-    "node-fetch": "^2.6.0",
     "react": "16.8.6",
     "react-native": "0.60.4",
     "react-native-awesome-card-io": "^0.8.2",
-    "react-native-base64": "0.0.2",
     "react-native-camera": "^3.1.1",
     "react-native-geolocation-service": "^3.0.0",
     "react-native-maps": "^0.25.0",
@@ -21,10 +19,8 @@
     "react-native-qrcode-scanner": "^1.2.1",
     "react-native-text-input-mask": "^1.0.6",
     "react-native-vector-icons": "^6.6.0",
-    "react-navigation": "^3.11.1",
     "react-redux": "^7.1.0",
-    "redux": "^4.0.4",
-    "rn-viewpager": "^1.2.9"
+    "redux": "^4.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",

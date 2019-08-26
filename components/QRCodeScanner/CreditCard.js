@@ -1,15 +1,14 @@
-import React from 'react'
-import { View, TextInput, Text, ActivityIndicator, TouchableWithoutFeedback, Alert } from 'react-native'
-import TextInputMask from 'react-native-text-input-mask'
-import { CardIOModule } from 'react-native-awesome-card-io'
-import Icon from 'react-native-vector-icons/Ionicons'
-import AsyncStorage from '@react-native-community/async-storage'
-import { connect } from 'react-redux'
-
-import {switchCCToken} from '../../redux/actions/actions'
-import { Title, Subtitle, Text as SmallText } from '../common/Text'
-import { Shadow } from '../common/Shadow'
+import AsyncStorage from '@react-native-community/async-storage';
+import React from 'react';
+import { ActivityIndicator, Alert, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { CardIOModule } from 'react-native-awesome-card-io';
+import TextInputMask from 'react-native-text-input-mask';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 import API from '../../API';
+import { switchCCToken } from '../../redux/actions/actions';
+import { Shadow } from '../common/Shadow';
+import { Subtitle, Text as SmallText, Title } from '../common/Text';
 
 const cleanDigits = (text) => text.replace(/\D/g, '')
 

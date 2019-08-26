@@ -1,5 +1,5 @@
-import React from 'react'
-import { Text as DefaultText } from 'react-native'
+import React from 'react';
+import { Text as DefaultText } from 'react-native';
 
 const Text = (props) =>
     <DefaultText style={{ fontFamily: "WorkSansLight", ...props.style }}>
@@ -13,4 +13,4 @@ const Subtitle = (props) =>
     <Text style={{ fontSize: 24, ...props.style }}>
         {props.children}
     </Text>
-export { Title, Subtitle, Text }
+export { Title, Subtitle, Text };
